@@ -16,6 +16,7 @@ use Digest::SHA;
 use String::CamelCase 'camelize';
 
 our $MT_HOME;
+our $PreparedMySQL;
 
 BEGIN {
     my $me = Cwd::realpath(__FILE__);
@@ -222,7 +223,7 @@ sub _connect_info_sqlite {
 
 sub _prepare_mysql_database {
     my ( $self, $dbh ) = @_;
-    return if $self->{__prepared};
+    return if ref $self ? $self->{__prepared} : $PreparedMySQL;
 
     local $dbh->{RaiseError} = 1;
     my $sql = <<"END_OF_SQL";
@@ -232,7 +233,7 @@ END_OF_SQL
     for my $statement ( split ";\n", $sql ) {
         $dbh->do($statement);
     }
-    $self->{__prepared} = 1;
+    ref $self ? $self->{__prepared} = 1 : $PreparedMySQL = 1;
 }
 
 # for App::Prove::Plugin::MySQLPool
