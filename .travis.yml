@@ -3,6 +3,9 @@ sudo: required
 services:
   - docker
 
+addons:
+  chrome: stable
+
 env:
   matrix:
     - PERL_VERSION="5.18" TEST_COMMAND="prove -j4 -PMySQLPool=MT::Test::Env -It/lib t/*.t"
