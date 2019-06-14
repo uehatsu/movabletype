@@ -116,20 +116,20 @@ sub write_config {
     $config{$_} = $connect_info{$_} for keys %connect_info;
 
     open my $fh, '>', $self->config_file or plan skip_all => $!;
-    $self->_write_config($fh, \%config);
+    $self->_write_config( $fh, \%config );
     close $fh;
 }
 
 sub update_config {
-    my ($self, %config) = @_;
+    my ( $self, %config ) = @_;
 
     my %extra = ( %{ $self->{config} || {} }, %config );
 
-    $self->write_config(\%extra);
+    $self->write_config( \%extra );
 }
 
 sub _write_config {
-    my ($self, $fh, $config) = @_;
+    my ( $self, $fh, $config ) = @_;
 
     my $root = $self->{root};
     for my $key ( sort keys %$config ) {
