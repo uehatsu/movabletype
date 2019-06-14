@@ -114,24 +114,32 @@ sub write_config {
 
     $config{$_} = $connect_info{$_} for keys %connect_info;
 
-    my $root = $self->{root};
     open my $fh, '>', $self->config_file or plan skip_all => $!;
-    for my $key ( sort keys %config ) {
-        if ( ref $config{$key} eq 'ARRAY' ) {
-            for my $value ( @{ $config{$key} } ) {
-                $value =~ s/\bMT_HOME\b/$MT_HOME/;
-                $value =~ s/\bTEST_ROOT\b/$root/ and mkpath($value);
-                print $fh "$key $value\n";
-            }
-        }
-        else {
-            my $value = $config{$key};
-            $value =~ s/\bMT_HOME\b/$MT_HOME/;
-            $value =~ s/\bTEST_ROOT\b/$root/ and mkpath($value);
-            print $fh "$key $value\n";
+    $self->_write_config($fh, \%config);
+    close $fh;
+}
+
+sub update_config {
+    my ($self, %config) = @_;
+
+    my %extra = ( %{ $self->{config} || {} }, %config );
+
+    $self->write_config(\%extra);
+}
+
+sub _write_config {
+    my ($self, $fh, $config) = @_;
+
+    my $root = $self->{root};
+    for my $key ( sort keys %$config ) {
+        my $value = $config->{$key};
+        my @values = ref $value eq 'ARRAY' ? @$value : ($value);
+        for my $v (@values) {
+            $v =~ s/\bMT_HOME\b/$MT_HOME/;
+            $v =~ s/\bTEST_ROOT\b/$root/ and mkpath($v);
+            print $fh "$key $v\n";
         }
     }
-    close $fh;
 }
 
 sub connect_info {
@@ -214,6 +222,8 @@ sub _connect_info_sqlite {
 
 sub _prepare_mysql_database {
     my ( $self, $dbh ) = @_;
+    return if $self->{__prepared};
+
     local $dbh->{RaiseError} = 1;
     my $sql = <<"END_OF_SQL";
 DROP DATABASE IF EXISTS mt_test;
@@ -222,6 +232,7 @@ END_OF_SQL
     for my $statement ( split ";\n", $sql ) {
         $dbh->do($statement);
     }
+    $self->{__prepared} = 1;
 }
 
 # for App::Prove::Plugin::MySQLPool
