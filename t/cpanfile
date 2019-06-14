@@ -98,6 +98,7 @@ on 'test' => sub {
     requires 'Net::SFTP';
     requires 'PHP::Serialization';
     requires 'pQuery';
+    requires 'Selenium::Remote::Driver';
     requires 'SQL::Maker';
     requires 'SQL::Translator';
     requires 'String::CamelCase';
@@ -115,5 +116,4 @@ on 'test' => sub {
     requires 'Text::Diff';
     requires 'Time::Piece';
     requires 'URI::Escape';
-    requires 'Wight';
 };
