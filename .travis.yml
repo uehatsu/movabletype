@@ -3,9 +3,6 @@ sudo: required
 services:
   - docker
 
-addons:
-  chrome: stable
-
 env:
   matrix:
     - PERL_VERSION="5.18" TEST_COMMAND="prove -j4 -PMySQLPool=MT::Test::Env -It/lib t/*.t"
@@ -51,7 +48,7 @@ env:
     - PERL_VERSION="5.26" TEST_COMMAND="phpunit && make test-php-lint"
 
 script:
-  - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "$PERL_VERSION" = "5.18" ]; then docker run -t -v $PWD:/mt -w /mt masiuchi/docker-mt-test:trusty-full bash -c "$TEST_COMMAND" ; fi
+  - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "$PERL_VERSION" = "5.18" ]; then docker run -d --network host charsbar/docker-chromedriver && docker run -t -v $PWD:/mt -w /mt masiuchi/docker-mt-test:trusty-full bash -c "$TEST_COMMAND" ; fi
 
   - if [ "$TRAVIS_EVENT_TYPE" != "cron" ] && [ "$PERL_VERSION" = "5.24" ] && ([ $TRAVIS_BRANCH = "master" ] || [ $TRAVIS_BRANCH = "develop" ] || [[ $TRAVIS_BRANCH =~ ^support- ]] || [[ $TRAVIS_BRANCH =~ ^release- ]]); then docker run -t -v $PWD:/mt -w /mt masiuchi/docker-mt-test:stretch-full bash -c "$TEST_COMMAND" ; fi
 
