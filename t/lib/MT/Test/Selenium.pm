@@ -8,7 +8,7 @@ use Plack::Builder;
 use File::Spec;
 use File::Which qw/which/;
 use URI;
-use JSON::PP;  # silence redefine warnings
+use JSON::PP;    # silence redefine warnings
 use MT::PSGI;
 use constant DEBUG => $ENV{MT_TEST_SELENIUM_DEBUG} ? 1 : 0;
 
@@ -39,9 +39,8 @@ sub new {
         code => sub {
             my $port = shift;
 
-            $env->update_config(
-                CGIPath => "http://127.0.0.1:$port/cgi-bin/",
-            );
+            my %extra = ( CGIPath => "http://127.0.0.1:$port/cgi-bin/" );
+            $env->update_config(%extra);
 
             my $app     = MT::PSGI->new->to_app;
             my $builder = builder {
