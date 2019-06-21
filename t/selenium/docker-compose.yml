@@ -20,7 +20,7 @@ services:
     networks:
       my_net:
     command: >-
-      bash -c "$TEST_COMMAND"
+      bash -c "TRAVIS=1 $TEST_COMMAND"
 networks:
   my_net:
     driver: bridge
