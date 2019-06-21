@@ -11,6 +11,7 @@ use URI;
 use JSON::PP;    # silence redefine warnings
 use MT::PSGI;
 use constant DEBUG => $ENV{MT_TEST_SELENIUM_DEBUG} ? 1 : 0;
+use constant MY_HOST => $ENV{TRAVIS} ? $ENV{HOSTNAME} : '127.0.0.1';
 
 our %EXTRA = (
     "Selenium::Chrome" => {
@@ -39,7 +40,8 @@ sub new {
         code => sub {
             my $port = shift;
 
-            my %extra = ( CGIPath => "http://127.0.0.1:$port/cgi-bin/" );
+            my $host = MY_HOST;
+            my %extra = ( CGIPath => "http://$host:$port/cgi-bin/" );
             $env->update_config(%extra);
 
             my $app     = MT::PSGI->new->to_app;
@@ -87,7 +89,8 @@ sub new {
     $driver->debug_on if DEBUG;
 
     my $port     = $server->port;
-    my $base_url = URI->new("http://127.0.0.1:$port");
+    my $host     = MY_HOST;
+    my $base_url = URI->new("http://$host:$port");
 
     bless {
         server   => $server,
