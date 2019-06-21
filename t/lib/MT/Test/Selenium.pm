@@ -31,6 +31,10 @@ our %EXTRA = (
                 'window-size=1280,800', 'no-sandbox',
             ],
         },
+        travis => {
+            remote_server_addr => 'chromedriver',
+            port               => 9515,
+        },
     },
 );
 
@@ -71,12 +75,16 @@ sub new {
         extra_capabilities  => $extra,
         acceptInsecureCerts => 1,
         timeout             => 10,
-        port                => 9515,
     );
     for my $binary ( @{ delete $extra->{binaries} || [] } ) {
         $binary = _fix_binary($binary) or next;
         $driver_opts{binary} = $binary;
         last;
+    }
+
+    my $travis_config = delete $extra->{travis};
+    if ( $ENV{TRAVIS} ) {
+        %driver_opts = ( %driver_opts, %$travis_config );
     }
 
     if (DEBUG) {
