@@ -15,9 +15,9 @@ our %EXTRA = (
         chromeOptions => {
             args => [
                 'headless', ( DEBUG ? 'enable-logging' : () ),
-                'window-size=1280,800',
+                'window-size=1280,800', 'no-sandbox',
             ],
-        }
+        },
     },
 );
 
