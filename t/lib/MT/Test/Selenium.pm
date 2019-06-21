@@ -23,6 +23,14 @@ our %EXTRA = (
         binaries =>
             [ 'chromedriver', '/usr/lib/chromium-browser/chromedriver', ],
     },
+    "Selenium::Remote::Driver" => {
+        chromeOptions => {
+            args => [
+                'headless', ( DEBUG ? 'enable-logging' : () ),
+                'window-size=1280,800', 'no-sandbox',
+            ],
+        },
+    },
 );
 
 sub new {
@@ -50,17 +58,19 @@ sub new {
         },
     );
 
-    my $driver_class = $ENV{MT_TEST_SELENIUM_DRIVER} || 'Selenium::Chrome';
+    my $driver_class = $ENV{MT_TEST_SELENIUM_DRIVER}
+        || ( $ENV{TRAVIS} ? 'Selenium::Remote::Driver' : 'Selenium::Chrome' );
+    eval "require $driver_class";
 
     my $extra = $EXTRA{$driver_class} || {};
 
-    eval "require $driver_class";
     my %driver_opts = (
         auto_close          => 1,
         default_finder      => 'css',
         extra_capabilities  => $extra,
         acceptInsecureCerts => 1,
         timeout             => 10,
+        port                => 9515,
     );
     for my $binary ( @{ delete $extra->{binaries} || [] } ) {
         $binary = _fix_binary($binary) or next;
