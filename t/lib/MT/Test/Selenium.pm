@@ -5,6 +5,8 @@ use warnings;
 use Test::TCP;
 use Plack::Runner;
 use Plack::Builder;
+use File::Spec;
+use File::Which qw/which/;
 use URI;
 use JSON::PP;  # silence redefine warnings
 use MT::PSGI;
@@ -18,6 +20,8 @@ our %EXTRA = (
                 'window-size=1280,800', 'no-sandbox',
             ],
         },
+        binaries =>
+            [ 'chromedriver', '/usr/lib/chromium-browser/chromedriver', ],
     },
 );
 
@@ -58,6 +62,11 @@ sub new {
         acceptInsecureCerts => 1,
         timeout             => 10,
     );
+    for my $binary ( @{ delete $extra->{binaries} || [] } ) {
+        $binary = _fix_binary($binary) or next;
+        $driver_opts{binary} = $binary;
+        last;
+    }
 
     if (DEBUG) {
         my $log_file = "$ENV{MT_HOME}/selenium_log.txt";
@@ -77,6 +86,16 @@ sub new {
         driver   => $driver,
         pid      => $$,
     }, $class;
+}
+
+sub _fix_binary {
+    my $binary = shift;
+    if ( File::Spec->file_name_is_absolute($binary) ) {
+        return $binary if -e $binary && -x _;
+    }
+    else {
+        which($binary);
+    }
 }
 
 sub driver { shift->{driver} }
