@@ -61,18 +61,14 @@ describe 'On Edit Image dialog (blog_id = 1, asset_id = 1)' => sub {
         };
         describe 'resize-apply button' => sub {
             it 'should be disabled' => sub {
-                is( $selenium->find('button#resize-apply')
-                        ->attribute('disabled'),
-                    'true'
-                );
+                ok( $selenium->find('button#resize-apply')
+                        ->attribute('disabled') );
             };
         };
         describe 'resize-reset button' => sub {
             it 'should be disabled' => sub {
-                is( $selenium->find('button#resize-reset')
-                        ->attribute('disabled'),
-                    'true'
-                );
+                ok( $selenium->find('button#resize-reset')
+                        ->attribute('disabled') );
             };
         };
     };
@@ -119,9 +115,8 @@ describe 'On Edit Image dialog (blog_id = 1, asset_id = 1)' => sub {
         };
         describe 'resize-apply button' => sub {
             it 'should be disabled' => sub {
-                is( $selenium->find('button#resize-apply')
+                ok( $selenium->find('button#resize-apply')
                         ->attribute('disabled'),
-                    'true'
                 );
             };
         };
